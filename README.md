@@ -2,7 +2,7 @@
 Por Akira Yano
 
 - Importar la fuente Open Sans
-- Importar Bootstrap
+- Importar Bootstrap (http://getbootstrap.com/)
 - Importar Font-awesome
 
 - Fondo header: #FFF
