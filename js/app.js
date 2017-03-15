@@ -46,9 +46,14 @@ app.service('AccountService', function(Config, $q, $http){
 	}
 
 	function saveAccount(params){
-		var last = accounts[accounts.length - 1].id;
-		params.id = last + 1;
-		accounts.push(params);
+		var deferred = $q.defer();
+
+		$http.post(Config.BASE + Config.ACCOUNTS, params)
+			.then(function(response){
+				deferred.resolve(response);
+			});
+
+		return deferred.promise;
 	}
 
 	function deleteAccount(id){
@@ -94,7 +99,7 @@ app.controller('AccountsController',
 			AccountService.listar()
 				.then(function(response){
 					console.log(response);
-					//$scope.lista = response.data;
+					$scope.lista = response.data.data;
 				});
 		}
 
@@ -123,8 +128,15 @@ app.controller('AddAccountController',
 		console.log('crear');
 		
 		if($scope.formulario.$valid){
-			AccountService.grabar($scope.cuenta);
-			$location.path('/accounts');
+			AccountService.grabar($scope.cuenta)
+				.then(function(response){
+					if(response.data.status == 1){
+						$location.path('/accounts');			
+					}else{
+						alert('Ocurrió un error');
+					}
+				})
+			
 		}
 
 		

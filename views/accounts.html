@@ -21,7 +21,7 @@
 		<tr ng-repeat="cuenta in lista | filter:buscar">
 			<td>{{cuenta.firstname | uppercase}}</td>
 			<td>{{cuenta.lastname}}</td>
-			<td>{{cuenta.mail | reverse}}</td>
+			<td>{{cuenta.mail}}</td>
 			<td>{{cuenta.accountNumber}}</td>
 			<td>{{cuenta.currency}}</td>
 			<td>{{cuenta.amount | currency:cuenta.currency}}</td>
