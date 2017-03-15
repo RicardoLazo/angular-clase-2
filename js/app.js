@@ -57,17 +57,14 @@ app.service('AccountService', function(Config, $q, $http){
 	}
 
 	function deleteAccount(id){
-		var index;
-		for(var i = 0; i < accounts.length; i++){
-			if(accounts[i].id === id){
-				index = i;
-				break;
-			}
-		}
+		var deferred = $q.defer();
+		// http://localhost:3036/accounts/123123
+		$http.delete(Config.BASE + Config.ACCOUNTS + id)
+			.then(function(response){
+				deferred.resolve(response);
+			});
 
-		if(index){
-			accounts.splice(index, 1);
-		}
+		return deferred.promise;
 	}
 
 	return{
@@ -104,8 +101,14 @@ app.controller('AccountsController',
 		}
 
 		$scope.onDelete = function(id){
-			AccountService.eliminar(id);
-			$scope.lista = AccountService.listar();
+			AccountService.eliminar(id)
+				.then(function(response){
+					if(response.data.status == 1){
+						listar();
+					}else{
+						alert('Ocurrió un error');
+					}
+				});
 		}
 
 		listar();

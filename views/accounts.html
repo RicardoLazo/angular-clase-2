@@ -25,7 +25,7 @@
 			<td>{{cuenta.accountNumber}}</td>
 			<td>{{cuenta.currency}}</td>
 			<td>{{cuenta.amount | currency:cuenta.currency}}</td>
-			<td><a href="#" ng-click="onDelete(cuenta.id)">
+			<td><a href="#" ng-click="onDelete(cuenta._id)">
 				<i class="fa fa-trash"></i>
 			</a></td>
 		</tr>
