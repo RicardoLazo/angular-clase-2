@@ -20,7 +20,12 @@ app.config(function($routeProvider, $locationProvider){
 	$locationProvider.hashPrefix("");
 });
 
-app.service('AccountService', function(){
+app.constant('Config',{
+	'BASE': 'http://192.168.1.35:3039/',
+	'ACCOUNTS': 'accounts/',
+});
+
+app.service('AccountService', function(Config, $q, $http){
 
 	var accounts = [
 		{ id:1, firstname: 'Edmundo', lastname: 'Acosta', mail: 'eacosta@atypax.net', accountNumber:'189-123123123-1', amount:'8000.99', currency:'USD$' },
@@ -30,11 +35,40 @@ app.service('AccountService', function(){
 	];
 
 	function getAccounts(){
-		return accounts;
+		var deferred = $q.defer();
+
+		$http.get(Config.BASE + Config.ACCOUNTS)
+			.then(function(response){
+				deferred.resolve(response);
+			});
+
+		return deferred.promise;
+	}
+
+	function saveAccount(params){
+		var last = accounts[accounts.length - 1].id;
+		params.id = last + 1;
+		accounts.push(params);
+	}
+
+	function deleteAccount(id){
+		var index;
+		for(var i = 0; i < accounts.length; i++){
+			if(accounts[i].id === id){
+				index = i;
+				break;
+			}
+		}
+
+		if(index){
+			accounts.splice(index, 1);
+		}
 	}
 
 	return{
-		listar: getAccounts
+		listar: getAccounts,
+		grabar: saveAccount,
+		eliminar: deleteAccount,
 	}
 
 });
@@ -54,11 +88,27 @@ app.controller('HomeController', function($scope){
 app.controller('AccountsController', 
 	function($scope, AccountService){
 
-		$scope.lista = AccountService.listar();
+		//$scope.lista = AccountService.listar();
+
+		function listar(){
+			AccountService.listar()
+				.then(function(response){
+					console.log(response);
+					//$scope.lista = response.data;
+				});
+		}
+
+		$scope.onDelete = function(id){
+			AccountService.eliminar(id);
+			$scope.lista = AccountService.listar();
+		}
+
+		listar();
 	
 });
 
-app.controller('AddAccountController', function($scope){
+app.controller('AddAccountController', 
+	function($scope, AccountService, $location){
 
 	$scope.cuenta = {
 		currency: '',
@@ -71,6 +121,13 @@ app.controller('AddAccountController', function($scope){
 
 	$scope.onSubmit = function(){
 		console.log('crear');
+		
+		if($scope.formulario.$valid){
+			AccountService.grabar($scope.cuenta);
+			$location.path('/accounts');
+		}
+
+		
 	}
 });
 
